@@ -1,1 +1,1 @@
-web: gunicorn --chdir hexlet_code task_manager.wsgi:application --bind 0.0.0.0:$PORT
+web: gunicorn --chdir hexlet_code hexlet_code.wsgi:application --bind 0.0.0.0:$PORT

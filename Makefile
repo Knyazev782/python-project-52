@@ -11,4 +11,5 @@ build:
 	./build.sh
 
 render-start:
-	gunicorn task_manager.wsgi:application
+	gunicorn --chdir hexlet_code hexlet_code.wsgi
+
