@@ -29,5 +29,4 @@ urlpatterns = [
     path('users/create/', views.CreateUserView.as_view(), name='create_users'),
     path('users/<int:pk>/update/', views.UpdateUserView.as_view(), name='update_users'),
     path('users/<int:pk>/delete/', views.DeleteUserView.as_view(), name='delete_users'),
-
 ]
