@@ -1,1 +1,1 @@
-web: gunicorn --chdir hexlet_code hexlet_code.wsgi:application --bind 0.0.0.0:$PORT
+web: gunicorn --chdir python-project-52/hexlet_code hexlet_code.wsgi:application --bind 0.0.0.0:$PORT
