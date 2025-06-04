@@ -11,4 +11,4 @@ build:
 	./build.sh
 
 render-start:
-	gunicorn --chdir task_manager task_manager.wsgi:application --bind 0.0.0.0:$PORT
+	gunicorn --chdir task_manager task_manager.wsgi:application --bind 0.0.0.0:$(PORT)
