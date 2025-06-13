@@ -1,62 +1,68 @@
-from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.db.models import ProtectedError
 from .models import Users
-from .forms import RegistrationUserForm, UpdateUserForm
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .forms import UserRegistrationForm
 from django.contrib import messages
 
-
-def index(request):
-    return render(request, 'index.html')
-
-
-class UserListView(ListView):
+class UsersView(ListView):
     model = Users
-    template_name = 'user_list.html'
+    template_name = 'users/user_list.html'
 
+    def get_queryset(self):
+        return Users.objects.all()
 
-class CreateUserView(CreateView):
+class CreateUser(SuccessMessageMixin, CreateView):
     model = Users
-    form_class = RegistrationUserForm
-    success_url = '/login/'
-    template_name = 'create_users.html'
+    form_class = UserRegistrationForm
+    template_name = 'users/user_create.html'
+    success_url = reverse_lazy('login')
+    success_message = "Пользователь успешно зарегистрирован."
+
     def form_valid(self, form):
-        messages.success(self.request, 'Пользователь успешно создан')
+        form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    def form_invalid(self, form):
-        messages.error(self.request, 'Ошибка при регистрации')
-        return super().form_invalid(form)
-
-
-class UpdateUserView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class UpdateUser(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Users
-    form_class = UpdateUserForm
-    success_url = '/users/'
-    template_name = 'update_users.html'
+    form_class = UserRegistrationForm
+    template_name = 'users/user_update.html'
+    success_url = reverse_lazy('users')
+    success_message = "Пользователь успешно изменен."
 
-    def test_func(self):
-        return self.request.user == self.get_object()
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object != request.user:
+            messages.error(request, "Вы можете изменять только себя.")
+            return redirect('users')
+        return super().dispatch(request, *args, **kwargs)
 
+    def get_object(self, queryset=None):
+        return super().get_object(queryset)
 
-    def handle_no_permission(self):
-        messages.error(self.request, 'Вам нельзя редактировать этого пользователя')
-        return super().handle_no_permission()
-
-
-
-class DeleteUserView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class DeleteUser(LoginRequiredMixin, DeleteView):
     model = Users
-    success_url = '/users/'
-    template_name = 'delete_users.html'
+    template_name = 'users/user_delete.html'
+    success_url = reverse_lazy('users')
 
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Пользователь успешно удалён')
-        return super().delete(request, *args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object != request.user:
+            messages.error(request, "Вы можете удалять только себя.")
+            return redirect('users')
+        return super().dispatch(request, *args, **kwargs)
 
-    def test_func(self):
-        return self.request.user == self.get_object()
+    def get_object(self, queryset=None):
+        return super().get_object(queryset)
 
-    def handle_no_permission(self):
-        messages.error(self.request, 'Вам нельзя удалять этого пользователя')
-        return super().handle_no_permission()
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+            messages.success(request, "Пользователь успешно удален.")
+        except ProtectedError:
+            messages.error(request, "Нельзя удалить пользователя, так как он связан с задачами.")
+        return redirect(self.success_url)

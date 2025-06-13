@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h2>Статусы</h2>
+{% if messages %}
+    {% with messages.last as last_message %}
+        {% if last_message.tags == 'error' %}
+            <div class="alert alert-danger">{{ last_message }}</div>
+        {% elif last_message.tags == 'success' %}
+            <div class="alert alert-success">{{ last_message }}</div>
+        {% endif %}
+    {% endwith %}
+{% endif %}
+{% if user.is_authenticated %}
+    <a href="{% url 'create_status' %}" class="btn btn-primary mb-3">Создать статус</a>
+{% endif %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Дата создания</th>
+            <th></th>
+        </tr>
+    </thead>
+    {% for status in object_list %}
+    <tr>
+        <td>{{ status.id }}</td>
+        <td>{{ status.name }}</td>
+        <td>{{ status.created_at }}</td>
+        <td>
+            <form action="{% url 'update_status' pk=status.id %}" method="get">
+                <button type="submit" class="btn btn-outline-primary">Изменить</button>
+            </form>
+            <form action="{% url 'delete_status' pk=status.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

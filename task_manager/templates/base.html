@@ -1,0 +1,52 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Manager{% endblock %}</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{% url 'index' %}">Task Manager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'statuses' %}">Статусы</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
+                    </li>
+                {% endif %}
+            </ul>
+            {% if user.is_authenticated %}
+                <form action="{% url 'logout' %}" method="post" class="form-inline my-2 my-lg-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-success">Выйти ({{ user.get_full_name }})</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
+                <a href="{% url 'create_user' %}" class="btn btn-outline-success">Регистрация</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% bootstrap_messages %}
+    {% block content %}
+    <div class="text-center mt-4">
+        <h1>Task Manager</h1>
+        <p>Простой и функциональный менеджер задач</p>
+    </div>
+    {% endblock %}
+</body>
+</html>

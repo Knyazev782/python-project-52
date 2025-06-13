@@ -1,0 +1,22 @@
+[
+    {
+        "model": "users.Users",
+        "pk": 1,
+        "fields": {
+            "username": "testuser",
+            "first_name": "Тест",
+            "last_name": "Пользователь",
+            "password": "pbkdf2_sha256$1000000$pAfxXZOgNhehMQmumIaLRP$m2I/yZtKn/c50u84o9DTMfkb0HZ2BG0tTfVtvp6ksdY="
+        }
+    },
+    {
+        "model": "users.Users",
+        "pk": 2,
+        "fields": {
+            "username": "testuser2",
+            "first_name": "Тест2",
+            "last_name": "Пользователь2",
+            "password": "pbkdf2_sha256$1000000$pAfxXZOgNhehMQmumIaLRP$m2I/yZtKn/c50u84o9DTMfkb0HZ2BG0tTfVtvp6ksdY="
+        }
+    }
+]

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h2>Удаление статуса</h2>
+{% if messages %}
+    {% with messages.last as last_message %}
+        {% if last_message.tags == 'error' %}
+            <div class="alert alert-danger">{{ last_message }}</div>
+        {% elif last_message.tags == 'success' %}
+            <div class="alert alert-success">{{ last_message }}</div>
+        {% endif %}
+    {% endwith %}
+{% endif %}
+{% if not messages %}
+    <form method="post">
+        {% csrf_token %}
+        <p>Вы уверены, что хотите удалить статус?</p>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url 'statuses' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endif %}
+{% endblock %}

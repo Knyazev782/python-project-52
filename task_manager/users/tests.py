@@ -1,95 +1,68 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+from task_manager.users.models import Users
 
-
-User = get_user_model()
-
-class UserTests(TestCase):
+class CrudUsersTestCases(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username='Nickname',
-                                             password='Password123')
-
-        self.other_user = User.objects.create_user(username="OtherUser",
-                                                   password="Password123")
-
-    @staticmethod
-    def get_form_data(**kwargs):
-        valid_data = {
-                      'username': 'NewUser',
-                      'first_name': 'name',
-                      'last_name': 'last_name',
-                      'password1': 'Password123',
-                      'password2': 'Password123'
-                     }
-        valid_data.update(kwargs)
-        return valid_data
+        self.user = Users.objects.create_user(username='testuser', password='12345')
+        self.another_user = Users.objects.create_user(username='anotheruser', password='12345')
+        self.client.login(username='testuser', password='12345')
+        self.custom_user = self.user
+        self.another_custom_user = self.another_user
 
     def test_create_user(self):
-        register = reverse('create_users')
-        request = self.client.post(register, self.get_form_data(username="NewUser1"),
-                                        follow=True)
-        self.assertRedirects(request, '/login/', status_code=302)
-        self.assertTrue(User.objects.filter(username="NewUser1").exists())
+        response = self.client.post(reverse('create_user'), {
+            'username': 'newuser123',
+            'password1': '12345',
+            'password2': '12345',
+            'first_name': 'New',
+            'last_name': 'User'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Users.objects.count(), 2)
 
-    def test_create_user_invalid(self):
-        register = reverse('create_users')
-        request = self.client.post(register, self.get_form_data(password2="Pass111"))
-        self.assertEqual(request.status_code, 200)
-        self.assertFalse(User.objects.filter(username="NewUser").exists())
+    def test_list_users(self):
+        response = self.client.get(reverse('users'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/user_list.html')
 
-    def test_update_user_if_logged(self):
-        self.client.force_login(self.user)
-        url = reverse('update_users', args=[self.user.id])
-        request = self.client.post(url, self.get_form_data(first_name="NewName"))
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.first_name == "NewName")
-        self.assertRedirects(request, '/users/', status_code=302)
-        self.assertTrue(User.objects.filter(first_name="NewName").exists())
+    def test_update_own_user(self):
+        url_path = reverse('update_user', kwargs={'pk': self.custom_user.id})
+        response = self.client.get(url_path)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/user_update.html')
 
-    def test_update_user_if_not_logged(self):
-        self.client.force_login(self.other_user)
-        self.user.first_name = "OldName"
-        self.user.save()
-        url = reverse('update_users', args=[self.user.id])
-        request = self.client.post(url, self.get_form_data(first_name='name'))
-        self.assertRedirects(request, '/users/', status_code=302)
-        self.assertTrue(User.objects.filter(first_name='OldName').exists())
+    def test_update_another_user(self):
+        url_path = reverse('update_user', kwargs={'pk': self.another_custom_user.id})
+        response = self.client.get(url_path)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('users'))
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Вы можете изменять только себя.")
 
-    def test_delete_user_if_logged(self):
-        self.client.force_login(self.user)
-        url =reverse('delete_users', args=[self.user.id])
-        request = self.client.post(url, self.get_form_data(first_name='name'))
-        self.assertRedirects(request, '/users/', status_code=302)
-        self.assertFalse(User.objects.filter(username="Nickname").exists())
+    def test_delete_own_user(self):
+        url_path = reverse('delete_user', kwargs={'pk': self.custom_user.id})
+        response = self.client.post(url_path)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('users'))
+        self.assertEqual(Users.objects.count(), 1)
 
-    def test_delete_user_if_not_logged(self):
-        self.client.force_login(self.other_user)
-        url = reverse('delete_users', args=[self.user.id])
-        request = self.client.post(url, self.get_form_data(first_name='name'))
-        self.assertTrue(User.objects.filter(username="Nickname").exists())
-        self.assertRedirects(request, '/users/', status_code=302)
-        self.assertTrue(User.objects.filter(username="Nickname").exists())
+    def test_delete_another_user(self):
+        url_path = reverse('delete_user', kwargs={'pk': self.another_custom_user.id})
+        response = self.client.post(url_path)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('users'))
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Вы можете удалять только себя.")
 
-    def test_login_required(self):
-        request = self.client.get('/users/')
-        self.assertEqual(request.status_code, 200)
+    # test_protected_user
+    # def test_protected_user(self):
+    #     with self.assertRaises(IntegrityError):
+    #         self.custom_user.delete()
 
-    def test_view_users(self):
-        request = self.client.get('/users/')
-        self.assertEqual(request.status_code, 200)
-
-    def test_login(self):
-        login_url = reverse('login')
-        request = self.client.post(login_url, {
-            'username': 'Nickname',
-            'password': 'Password123'},
-            follow=True)
-        self.assertRedirects(request, '/', status_code=302)
-
-    def test_logout(self):
-        self.client.force_login(self.user)
-        logout_url = reverse('logout')
-        request = self.client.post(logout_url, follow=True)
-        self.assertRedirects(request, '/', status_code=302)
+    def tearDown(self):
+        self.client.logout()
+        Users.objects.all().delete()

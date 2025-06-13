@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h2>Пользователи</h2>
+{% if messages %}
+    {% with messages.last as last_message %}
+        {% if last_message.tags == 'error' %}
+            <div class="alert alert-danger">{{ last_message }}</div>
+        {% elif last_message.tags == 'success' %}
+            <div class="alert alert-success">{{ last_message }}</div>
+        {% endif %}
+    {% endwith %}
+{% endif %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Имя пользователя</th>
+            <th>Полное имя</th>
+            <th>Дата создания</th>
+            <th></th>
+        </tr>
+    </thead>
+    {% for user in object_list %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
+        <td>{{ user.date_joined }}</td>
+        <td>
+            <form action="{% url 'update_user' pk=user.id %}" method="get">
+                <button type="submit" class="btn btn-outline-primary">Изменить</button>
+            </form>
+            <form action="{% url 'delete_user' pk=user.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
