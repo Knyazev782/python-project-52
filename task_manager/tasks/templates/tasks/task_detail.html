@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <h1>Просмотр задачи</h1>
+  <p><strong>Название:</strong> {{ object.name }}</p>
+  <p><strong>Описание:</strong> {{ object.description }}</p>
+  <p><strong>Назначено:</strong> {{ object.assigned_to.username|default:"Не назначено" }}</p>
+  <p><strong>Статус:</strong> {{ object.status.name }}</p>
+  <p><strong>Автор:</strong> {{ object.author.username }}</p>
+  <a href="{% url 'tasks' %}" class="btn btn-secondary">Назад</a>
+  {% bootstrap_messages %}
+{% endblock %}

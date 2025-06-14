@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <h1>Список задач</h1>
+  {% if object_list %}
+    <ul>
+      {% for task in object_list %}
+        <li>
+          {{ task.name }} (Автор: {{ task.author.username }}, Статус: {{ task.status.name }})
+          <a href="{% url 'task_detail' task.pk %}">Просмотр</a>
+          <a href="{% url 'task_update' task.pk %}">Редактировать</a>
+          <a href="{% url 'task_delete' task.pk %}">Удалить</a>
+        </li>
+      {% empty %}
+        <li>Нет задач.</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Нет задач.</p>
+  {% endif %}
+  <a href="{% url 'task_create' %}" class="btn btn-primary">Создать задачу</a>
+  {% bootstrap_messages %}
+{% endblock %}
