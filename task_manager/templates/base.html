@@ -24,8 +24,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'statuses' %}">Статусы</a>
                     </li>
-                    <li class="nav-item"> <!-- Новая вкладка -->
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'tasks' %}">Задачи</a>
+                    </li>
+                    <li class="nav-item"> <!-- Новая вкладка для меток -->
+                        <a class="nav-link" href="{% url 'labels' %}">Метки</a>
                     </li>
                 {% else %}
                     <li class="nav-item">

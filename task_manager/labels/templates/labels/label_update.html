@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <h1>Редактировать метку</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+  </form>
+  <a href="{% url 'labels' %}" class="btn btn-secondary">Назад</a>
+  {% bootstrap_messages %}
+{% endblock %}

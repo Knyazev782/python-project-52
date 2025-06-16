@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <h1>Удалить метку</h1>
+  <p>Вы уверены, что хотите удалить метку "{{ object.name }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить</button>
+  </form>
+  <a href="{% url 'labels' %}" class="btn btn-secondary">Отмена</a>
+  {% bootstrap_messages %}
+{% endblock %}
