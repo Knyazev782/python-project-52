@@ -3,22 +3,35 @@
 
 {% block content %}
   <h1>Список задач</h1>
-  {% if object_list %}
-    <ul>
-      {% for task in object_list %}
-        <li>
-          {{ task.name }} (Автор: {{ task.author.username }}, Статус: {{ task.status.name }})
-          <a href="{% url 'task_detail' task.pk %}">Просмотр</a>
-          <a href="{% url 'task_update' task.pk %}">Редактировать</a>
-          <a href="{% url 'task_delete' task.pk %}">Удалить</a>
+
+  <!-- Форма фильтрации -->
+  {% if filter %}
+    <form method="get">
+      {% bootstrap_form filter.form %}
+      <button type="submit" class="btn btn-primary">Фильтровать</button>
+    </form>
+  {% endif %}
+
+  <!-- Список задач -->
+  {% if filter.qs %}
+    <ul class="list-group mt-3">
+      {% for task in filter.qs %}
+        <li class="list-group-item">
+          {{ task.name }} - Статус: {{ task.status.name }} - Исполнитель: {{ task.assigned_to.username }}
+          {% if task.labels.exists %}
+            Метки: {% for label in task.labels.all %}{{ label.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+          {% else %}
+            (Без меток)
+          {% endif %}
         </li>
       {% empty %}
-        <li>Нет задач.</li>
+        <li class="list-group-item">Нет задач по фильтру</li>
       {% endfor %}
     </ul>
   {% else %}
     <p>Нет задач.</p>
   {% endif %}
-  <a href="{% url 'task_create' %}" class="btn btn-primary">Создать задачу</a>
-  {% bootstrap_messages %}
+
+  <a href="{% url 'task_create' %}" class="btn btn-success mt-3">Создать задачу</a>
+  <a href="{% url 'tasks' %}" class="btn btn-secondary mt-3">Сбросить фильтр</a>
 {% endblock %}

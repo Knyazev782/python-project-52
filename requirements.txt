@@ -14,3 +14,4 @@ sqlparse==0.5.3
 trove-classifiers==2025.5.9.12
 typing-extensions==4.13.2
 whitenoise==6.9.0
+django-filter==25.1

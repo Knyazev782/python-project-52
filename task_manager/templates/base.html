@@ -27,7 +27,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'tasks' %}">Задачи</a>
                     </li>
-                    <li class="nav-item"> <!-- Новая вкладка для меток -->
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'labels' %}">Метки</a>
                     </li>
                 {% else %}
@@ -49,10 +49,10 @@
     </nav>
     {% bootstrap_messages %}
     {% block content %}
-    <div class="text-center mt-4">
-        <h1>Task Manager</h1>
-        <p>Простой и функциональный менеджер задач</p>
-    </div>
+        <div class="container mt-4">
+            <h1>Добро пожаловать в Task Manager</h1>
+            <p>Здесь вы можете управлять задачами, статусами и метками.</p>
+        </div>
     {% endblock %}
 </body>
 </html>
