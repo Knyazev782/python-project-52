@@ -3,6 +3,7 @@ from django.urls import reverse
 from task_manager.users.models import Users
 from task_manager.statuses.models import Statuses
 
+
 class CrudStatusesTestCases(TestCase):
     def setUp(self):
         self.client = Client()

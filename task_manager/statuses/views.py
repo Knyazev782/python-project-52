@@ -7,6 +7,8 @@ from django.db.models import ProtectedError
 from .models import Statuses
 from .forms import CreateStatusForm
 from django.contrib import messages
+from django.http import HttpResponse
+import rollbar
 
 class StatusesView(ListView):
     model = Statuses
@@ -67,3 +69,10 @@ class DeleteStatus(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         except ProtectedError:
             messages.error(request, "Нельзя удалить статус, так как он используется.")
         return redirect(self.success_url)
+
+def test_error_view(request):
+    try:
+        1 / 0  # Это вызовет деление на ноль
+    except ZeroDivisionError:
+        rollbar.report_exc_info()
+    return HttpResponse("Ошибка отправлена в Rollbar!")
