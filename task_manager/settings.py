@@ -78,22 +78,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'task_manager.wsgi.application'
 
-# Явная настройка базы данных
-if 'PYTEST_CURRENT_TEST' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        }
+# База данных: SQLite для разработки и тестов
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    # Для разработки используем файл SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
+
+# Для тестов переопределяем базу в памяти через pytest
+if os.environ.get('RUNNING_TESTS'):
+    DATABASES['default']['NAME'] = ':memory:'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
