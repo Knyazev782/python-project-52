@@ -14,7 +14,6 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import rollbar
-import sys
 
 load_dotenv()
 
@@ -85,15 +84,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-# Настройки для тестовой среды (активируется при запуске тестов)
-if 'test' in ''.join(sys.argv).lower() or os.environ.get('RUNNING_TESTS', 'false').lower() == 'true':
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',  # Временная база для тестов
-    }
-    import django
-    django.setup()  # Явная инициализация Django для тестов
 
 AUTH_PASSWORD_VALIDATORS = [
     {
