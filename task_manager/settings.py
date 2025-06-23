@@ -14,13 +14,8 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import rollbar
-import logging
 
 load_dotenv()
-
-# Инициализация логгера
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -86,7 +81,7 @@ WSGI_APPLICATION = 'task_manager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'test_db.sqlite3'),  # Восстановлен путь к базе
+        'NAME': str(BASE_DIR / 'test_db.sqlite3'),
     }
 }
 

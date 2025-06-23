@@ -16,5 +16,5 @@ render-start:
 
 test:
 	uv sync
-	uv run manage.py migrate
-	RUNNING_TESTS=1 docker compose -f docker-compose.yml up --abort-on-container-exit
+	python manage.py migrate --noinput
+	uv run pytest -vv
