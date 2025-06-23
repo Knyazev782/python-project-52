@@ -78,10 +78,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'task_manager.wsgi.application'
 
+# Динамическая настройка базы данных
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': ':memory:' if 'PYTEST_CURRENT_TEST' in os.environ else BASE_DIR / 'db.sqlite3',
     }
 }
 
