@@ -85,11 +85,10 @@ DATABASES = {
     }
 }
 
-# Настройки для тестовой среды
-if 'TEST' in os.environ:
+if 'PYTEST_CURRENT_TEST' in os.environ:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',  # Используем временную базу для тестов
+        'NAME': ':memory:',
     }
 
 AUTH_PASSWORD_VALIDATORS = [
