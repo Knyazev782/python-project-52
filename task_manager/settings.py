@@ -14,6 +14,10 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import rollbar
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -85,9 +89,10 @@ DATABASES = {
     }
 }
 
-# Поддержка тестовой базы в памяти (если установлена переменная окружения)
-if 'PYTEST_CURRENT_TEST' in os.environ or 'RUNNING_TESTS' in os.environ:
+if 'PYTEST_CURRENT_TEST' in os.environ:
+    logger.debug("Switching to in-memory database for tests...")
     DATABASES['default']['NAME'] = ':memory:'
+    logger.debug(f"Database configuration: {DATABASES['default']}")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
