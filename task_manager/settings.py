@@ -14,10 +14,28 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import rollbar
+import dj_database_url
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Проверяем, является ли это локальной разработкой
+IS_LOCAL = os.getenv('DEBUG', 'True').lower() == 'true'
+
+# Определяем DATABASE_URL
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL and not IS_LOCAL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': str(BASE_DIR / 'db.sqlite3'),  # Изменили на db.sqlite3
+        }
+    }
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'temp-key-for-development-only')
 DEBUG = os.getenv('DEBUG', True)
@@ -77,13 +95,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'task_manager.wsgi.application'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'test_db.sqlite3'),
-    }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
