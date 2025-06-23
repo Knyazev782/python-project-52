@@ -16,23 +16,16 @@ from dotenv import load_dotenv
 import rollbar
 import logging
 
+load_dotenv()
+
+# Инициализация логгера
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-load_dotenv()
-
-ROLLBAR = {
-    'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
-    'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'development'),
-    'root': os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-}
-
-rollbar.init(**ROLLBAR)
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'temp-key-for-development-only'
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', 'temp-key-for-development-only')
+DEBUG = os.getenv('DEBUG', True)
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -62,6 +55,14 @@ MIDDLEWARE = [
     'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
+ROLLBAR = {
+    'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
+    'environment': 'development' if DEBUG else 'production',
+    'root': BASE_DIR,
+}
+
+rollbar.init(**ROLLBAR)
+
 ROOT_URLCONF = 'task_manager.urls'
 
 TEMPLATES = [
@@ -85,15 +86,9 @@ WSGI_APPLICATION = 'task_manager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'test_db.sqlite3'),  # Явное преобразование в строку
     }
 }
-
-# Улучшенная инициализация тестовой базы
-if 'PYTEST_CURRENT_TEST' in os.environ or 'TEST' in os.environ:
-    logger.debug("Switching to in-memory database for tests...")
-    DATABASES['default']['NAME'] = ':memory:'
-    logger.debug(f"Database configuration: {DATABASES['default']}")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
