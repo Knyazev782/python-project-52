@@ -27,7 +27,7 @@ rollbar.init(**ROLLBAR)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'temp-key-for-development-only'
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
@@ -84,6 +84,13 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Настройки для тестов
+if 'TEST' in os.environ:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
