@@ -86,7 +86,8 @@ WSGI_APPLICATION = 'task_manager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-    }  # Убрали 'NAME', пусть pytest-django решает
+        'NAME': str(BASE_DIR / 'test_db.sqlite3'),  # Восстановлен путь к базе
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
