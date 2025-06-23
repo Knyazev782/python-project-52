@@ -87,7 +87,7 @@ DATABASES = {
 }
 
 # Настройки для тестовой среды (активируется при запуске pytest)
-if 'pytest' in sys.argv[0]:  # Надёжная проверка запуска pytest
+if any(arg for arg in sys.argv if 'pytest' in arg):  # Проверка наличия pytest в аргументах
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',  # Временная база для тестов
