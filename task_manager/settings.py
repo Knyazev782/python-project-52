@@ -79,12 +79,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'task_manager.wsgi.application'
 
 # Динамическая настройка базы данных
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:' if 'PYTEST_CURRENT_TEST' in os.environ else BASE_DIR / 'db.sqlite3',
+if 'PYTEST_CURRENT_TEST' in os.environ:
+    # Используем базу в памяти для тестов
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
     }
-}
+else:
+    # Для разработки и продакшена используем файл или DATABASE_URL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {

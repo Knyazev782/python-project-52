@@ -5,4 +5,5 @@ from django.core.management import call_command
 def django_db_setup(django_db_setup, django_db_blocker):
     """Создает и применяет миграции к тестовой базе перед запуском тестов."""
     with django_db_blocker.unblock():
+        # Убедимся, что база создана и миграции применены
         call_command("migrate", "--noinput")
