@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import rollbar
+import sys
 
 load_dotenv()
 
@@ -85,8 +86,8 @@ DATABASES = {
     }
 }
 
-# Настройки для тестовой среды (активируется при запуске manage.py test)
-if 'TEST' in os.environ or 'test' in os.environ.get('DJANGO_SETTINGS_MODULE', ''):
+# Настройки для тестовой среды (активируется при запуске тестов)
+if 'test' in ''.join(sys.argv).lower() or os.environ.get('RUNNING_TESTS', 'false').lower() == 'true':
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',  # Временная база для тестов
