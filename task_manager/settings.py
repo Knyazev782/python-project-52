@@ -85,6 +85,10 @@ DATABASES = {
     }
 }
 
+# Поддержка тестовой базы в памяти (если установлена переменная окружения)
+if 'PYTEST_CURRENT_TEST' in os.environ or 'RUNNING_TESTS' in os.environ:
+    DATABASES['default']['NAME'] = ':memory:'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
