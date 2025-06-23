@@ -85,11 +85,11 @@ DATABASES = {
     }
 }
 
-# Настройки для тестов
+# Настройки для тестовой среды
 if 'TEST' in os.environ:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': ':memory:',  # Используем временную базу для тестов
     }
 
 AUTH_PASSWORD_VALIDATORS = [
