@@ -87,11 +87,14 @@ DATABASES = {
 }
 
 # Настройки для тестовой среды (активируется при запуске pytest)
-if any(arg for arg in sys.argv if 'pytest' in arg):  # Проверка наличия pytest в аргументах
+TEST_RUN = any('pytest' in arg.lower() for arg in sys.argv) or 'pytest' in os.environ.get('PYTEST_CURRENT_TEST', '').lower()
+if TEST_RUN:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',  # Временная база для тестов
     }
+    import django
+    django.setup()  # Явная инициализация Django для тестов
 
 AUTH_PASSWORD_VALIDATORS = [
     {
