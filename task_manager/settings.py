@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import rollbar
+import sys
 
 load_dotenv()
 
@@ -85,10 +86,11 @@ DATABASES = {
     }
 }
 
-if 'PYTEST_CURRENT_TEST' in os.environ:
+# Настройки для тестовой среды (активируется при запуске pytest)
+if 'pytest' in sys.argv[0]:  # Надёжная проверка запуска pytest
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': ':memory:',  # Временная база для тестов
     }
 
 AUTH_PASSWORD_VALIDATORS = [
