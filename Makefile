@@ -13,3 +13,8 @@ build:
 
 render-start:
 	gunicorn --chdir task_manager task_manager.wsgi:application --bind 0.0.0.0:$(PORT)
+
+test:
+	uv sync
+	uv run manage.py migrate
+	RUNNING_TESTS=1 docker compose -f docker-compose.yml up --abort-on-container-exit
