@@ -89,7 +89,8 @@ DATABASES = {
     }
 }
 
-if 'PYTEST_CURRENT_TEST' in os.environ:
+# Улучшенная инициализация тестовой базы
+if 'PYTEST_CURRENT_TEST' in os.environ or 'TEST' in os.environ:
     logger.debug("Switching to in-memory database for tests...")
     DATABASES['default']['NAME'] = ':memory:'
     logger.debug(f"Database configuration: {DATABASES['default']}")
