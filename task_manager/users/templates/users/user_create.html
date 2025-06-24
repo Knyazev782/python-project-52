@@ -5,19 +5,26 @@
     <h2>Регистрация нового пользователя</h2>
     <form method="post">
         {% csrf_token %}
-        {% for field in form %}
-            {% if field.name == 'first_name' %}
-                {% bootstrap_field field label="Имя" %}
-            {% elif field.name == 'last_name' %}
-                {% bootstrap_field field label="Фамилия" %}
-            {% elif field.name == 'username' %}
-                {% bootstrap_field field label="Имя пользователя" placeholder="Имя пользователя" %}
-            {% elif field.name == 'password1' %}
-                {% bootstrap_field field label="Пароль" placeholder="Пароль" %}
-            {% elif field.name == 'password2' %}
-                {% bootstrap_field field label="Подтверждение пароля" placeholder="Подтверждение пароля" %}
-            {% endif %}
-        {% endfor %}
+        <div class="mb-3">
+            <label for="id_first_name">Имя</label>
+            <input type="text" name="first_name" id="id_first_name" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="id_last_name">Фамилия</label>
+            <input type="text" name="last_name" id="id_last_name" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="id_username">Имя пользователя</label>
+            <input type="text" name="username" id="id_username" class="form-control" placeholder="Имя пользователя">
+        </div>
+        <div class="mb-3">
+            <label for="id_password1">Пароль</label>
+            <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Пароль">
+        </div>
+        <div class="mb-3">
+            <label for="id_password2">Подтверждение пароля</label>
+            <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Подтверждение пароля">
+        </div>
         <button type="submit" class="btn btn-primary">Зарегистрировать</button>
     </form>
 {% endblock %}
