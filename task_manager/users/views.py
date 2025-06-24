@@ -50,7 +50,6 @@ class UpdateUser(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 class DeleteUser(LoginRequiredMixin, DeleteView):
     model = Users
     template_name = 'users/user_delete.html'
-    success_url = reverse_lazy('users')
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -69,7 +68,7 @@ class DeleteUser(LoginRequiredMixin, DeleteView):
             messages.success(request, "Пользователь успешно удален.")
         except ProtectedError:
             messages.error(request, "Нельзя удалить пользователя, так как он связан с задачами.")
-        return redirect(self.success_url)
+        return HttpResponseRedirect(reverse_lazy('users'))
 
 class CustomLoginView(auth_views.LoginView):
     template_name = 'registration/login.html'
