@@ -8,6 +8,7 @@ from .models import Users
 from .forms import UserRegistrationForm
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
+from django.http import HttpResponseRedirect
 
 class UsersView(ListView):
     model = Users
@@ -81,4 +82,8 @@ class CustomLogoutView(auth_views.LogoutView):
     next_page = '/'
 
     def get(self, request, *args, **kwargs):
-        return self.post(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        return HttpResponseRedirect(self.next_page)
