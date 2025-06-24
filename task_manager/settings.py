@@ -20,12 +20,8 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Проверяем, является ли это локальной разработкой
-IS_LOCAL = os.getenv('DEBUG', 'True').lower() == 'true'
-
-# Определяем DATABASE_URL
 DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL and not IS_LOCAL:
+if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
     }
@@ -33,7 +29,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': str(BASE_DIR / 'db.sqlite3'),  # Изменили на db.sqlite3
+            'NAME': str(BASE_DIR / 'db.sqlite3'),
         }
     }
 
