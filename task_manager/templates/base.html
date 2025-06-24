@@ -42,7 +42,7 @@
                     <button type="submit" class="btn btn-outline-success">Выйти ({{ user.get_full_name }})</button>
                 </form>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-success">Вход</a>
                 <a href="{% url 'create_user' %}" class="btn btn-outline-success">Регистрация</a>
             {% endif %}
         </div>
