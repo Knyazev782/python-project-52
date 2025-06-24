@@ -5,7 +5,9 @@
 <h2>Вход</h2>
 <form method="post">
     {% csrf_token %}
-    {% bootstrap_form form %}
+    {% for field in form %}
+        {% bootstrap_field field placeholder=field.label %}
+    {% endfor %}
     <button type="submit" class="btn btn-primary">Вход</button>
 </form>
 {% endblock %}
