@@ -2,21 +2,40 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>Изменение пользователя</h2>
-{% if messages %}
-    {% with messages.last as last_message %}
-        {% if last_message.tags == 'error' %}
-            <div class="alert alert-danger">{{ last_message }}</div>
-        {% elif last_message.tags == 'success' %}
-            <div class="alert alert-success">{{ last_message }}</div>
-        {% endif %}
-    {% endwith %}
-{% endif %}
-{% if not messages %}
-    <form method="post">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-    </form>
-{% endif %}
+    <h2>Изменение пользователя</h2>
+    {% if messages %}
+        {% with messages.last as last_message %}
+            {% if last_message.tags == 'error' %}
+                <div class="alert alert-danger">{{ last_message }}</div>
+            {% elif last_message.tags == 'success' %}
+                <div class="alert alert-success">{{ last_message }}</div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+    {% if not messages %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_first_name">Имя</label>
+                <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form.initial.first_name }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_last_name">Фамилия</label>
+                <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ form.initial.last_name }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_username">Имя пользователя</label>
+                <input type="text" name="username" id="id_username" class="form-control" value="{{ form.initial.username }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_password1">Пароль</label>
+                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Новый пароль (оставьте пустым, если не меняете)">
+            </div>
+            <div class="mb-3">
+                <label for="id_password2">Подтверждение пароля</label>
+                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Подтверждение нового пароля">
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+    {% endif %}
 {% endblock %}
