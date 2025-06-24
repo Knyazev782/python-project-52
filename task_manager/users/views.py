@@ -12,12 +12,14 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from django.contrib.auth import logout
 
+
 class UsersView(ListView):
     model = Users
     template_name = 'users/user_list.html'
 
     def get_queryset(self):
         return Users.objects.all()
+
 
 class CreateUser(SuccessMessageMixin, CreateView):
     model = Users
@@ -29,6 +31,7 @@ class CreateUser(SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
 
 class UpdateUser(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Users
@@ -47,6 +50,7 @@ class UpdateUser(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_object(self, queryset=None):
         return super().get_object(queryset)
 
+
 class DeleteUser(LoginRequiredMixin, DeleteView):
     model = Users
     template_name = 'users/user_delete.html'
@@ -61,6 +65,9 @@ class DeleteUser(LoginRequiredMixin, DeleteView):
     def get_object(self, queryset=None):
         return super().get_object(queryset)
 
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data())
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         try:
@@ -70,6 +77,7 @@ class DeleteUser(LoginRequiredMixin, DeleteView):
             messages.error(request, "Нельзя удалить пользователя, так как он связан с задачами.")
         return HttpResponseRedirect(reverse_lazy('users'))
 
+
 class CustomLoginView(auth_views.LoginView):
     template_name = 'registration/login.html'
 
@@ -77,6 +85,7 @@ class CustomLoginView(auth_views.LoginView):
         response = super().form_valid(form)
         messages.success(self.request, "Вы залогинены")
         return response
+
 
 class CustomLogoutView:
     next_page = '/'
