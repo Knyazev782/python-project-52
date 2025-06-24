@@ -70,4 +70,8 @@ class DeleteUser(LoginRequiredMixin, DeleteView):
 
 class CustomLoginView(auth_views.LoginView):
     template_name = 'registration/login.html'
-    success_message = "Вы залогинены"
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Вы залогинены")
+        return response
