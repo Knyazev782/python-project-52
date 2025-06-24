@@ -82,5 +82,8 @@ class CustomLogoutView(auth_views.LogoutView):
     next_page = '/'
 
     def get(self, request, *args, **kwargs):
-        auth_views.logout(request)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        logout = super().post(request, *args, **kwargs)
         return HttpResponseRedirect(self.next_page)
