@@ -6,7 +6,11 @@
 <form method="post">
     {% csrf_token %}
     {% for field in form %}
-        {% bootstrap_field field placeholder=field.label %}
+        {% if field.name == 'username' %}
+            {% bootstrap_field field placeholder='Имя пользователя' %}
+        {% elif field.name == 'password' %}
+            {% bootstrap_field field placeholder='Пароль' %}
+        {% endif %}
     {% endfor %}
     <button type="submit" class="btn btn-primary">Вход</button>
 </form>
