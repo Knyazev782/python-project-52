@@ -17,12 +17,13 @@ Including another URLconf
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from .views import IndexView
+from task_manager.users.views import CustomLoginView
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('users/', include('task_manager.users.urls')),
     path('statuses/', include('task_manager.statuses.urls')),
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('login/', CustomLoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('tasks/', include('task_manager.tasks.urls')),
     path('labels/', include('task_manager.labels.urls'))

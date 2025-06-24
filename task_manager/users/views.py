@@ -7,6 +7,7 @@ from django.db.models import ProtectedError
 from .models import Users
 from .forms import UserRegistrationForm
 from django.contrib import messages
+from django.contrib.auth import views as auth_views
 
 class UsersView(ListView):
     model = Users
@@ -66,3 +67,7 @@ class DeleteUser(LoginRequiredMixin, DeleteView):
         except ProtectedError:
             messages.error(request, "Нельзя удалить пользователя, так как он связан с задачами.")
         return redirect(self.success_url)
+
+class CustomLoginView(auth_views.LoginView):
+    template_name = 'registration/login.html'
+    success_message = "Вы залогинены"
