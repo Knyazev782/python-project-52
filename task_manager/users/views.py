@@ -75,3 +75,10 @@ class CustomLoginView(auth_views.LoginView):
         response = super().form_valid(form)
         messages.success(self.request, "Вы залогинены")
         return response
+
+class CustomLogoutView(auth_views.LogoutView):
+    template_name = 'registration/logout.html'
+    next_page = '/'
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
