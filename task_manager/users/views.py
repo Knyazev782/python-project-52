@@ -9,6 +9,8 @@ from .forms import UserRegistrationForm
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponseRedirect
+from django.views import View
+from django.contrib.auth import logout
 
 class UsersView(ListView):
     model = Users
@@ -77,9 +79,17 @@ class CustomLoginView(auth_views.LoginView):
         messages.success(self.request, "Вы залогинены")
         return response
 
-class CustomLogoutView(auth_views.LogoutView):
+class CustomLogoutView:
     next_page = '/'
 
     def get(self, request, *args, **kwargs):
-        auth_views.logout(request)
+        logout(request)
         return HttpResponseRedirect(self.next_page)
+
+    def post(self, request, *args, **kwargs):
+        logout(request)  # Выполняем выход
+        return HttpResponseRedirect(self.next_page)
+
+    @classmethod
+    def as_view(cls):
+        return cls().get
