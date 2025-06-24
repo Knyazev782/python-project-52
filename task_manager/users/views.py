@@ -84,10 +84,12 @@ class CustomLogoutView:
 
     def get(self, request, *args, **kwargs):
         logout(request)
+        messages.success(request, "Вы разлогинены")
         return HttpResponseRedirect(self.next_page)
 
     def post(self, request, *args, **kwargs):
         logout(request)  # Выполняем выход
+        messages.success(request, "Вы разлогинены")
         return HttpResponseRedirect(self.next_page)
 
     @classmethod
