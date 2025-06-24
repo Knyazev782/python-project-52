@@ -78,12 +78,8 @@ class CustomLoginView(auth_views.LoginView):
         return response
 
 class CustomLogoutView(auth_views.LogoutView):
-    template_name = 'registration/logout.html'
     next_page = '/'
 
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        logout = super().post(request, *args, **kwargs)
+        auth_views.logout(request)
         return HttpResponseRedirect(self.next_page)
