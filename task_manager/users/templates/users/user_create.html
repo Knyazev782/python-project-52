@@ -1,11 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'users/base.html' %}
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>Регистрация</h2>
-<form method="post">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-</form>
+    <h2>Регистрация нового пользователя</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            {% if field.name == 'first_name' %}
+                {% bootstrap_field field label="Имя" %}
+            {% elif field.name == 'last_name' %}
+                {% bootstrap_field field label="Фамилия" %}
+            {% elif field.name == 'username' %}
+                {% bootstrap_field field label="Имя пользователя" placeholder="Имя пользователя" %}
+            {% elif field.name == 'password1' %}
+                {% bootstrap_field field label="Пароль" placeholder="Пароль" %}
+            {% elif field.name == 'password2' %}
+                {% bootstrap_field field label="Подтверждение пароля" placeholder="Подтверждение пароля" %}
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Зарегистрировать</button>
+    </form>
 {% endblock %}
