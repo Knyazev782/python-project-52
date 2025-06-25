@@ -25,15 +25,25 @@ class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        if not form.is_valid():
-            return self.form_invalid(form)
+        if not form.cleaned_data.get('status'):
+            from task_manager.statuses.models import Statuses
+            default_status = Statuses.objects.first()  # Берем первый доступный статус
+            if default_status:
+                form.instance.status = default_status
+        if not form.cleaned_data.get('assigned_to'):
+            from task_manager.users.models import Users
+            default_user = Users.objects.first()  # Берем первого доступного пользователя
+            if default_user:
+                form.instance.assigned_to = default_user
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if not context['form'].fields['status'].queryset.exists():
+        from task_manager.statuses.models import Statuses
+        from task_manager.users.models import Users
+        if not Statuses.objects.exists():
             messages.error(self.request, 'Нет доступных статусов для выбора.')
-        if not context['form'].fields['assigned_to'].queryset.exists():
+        if not Users.objects.exists():
             messages.error(self.request, 'Нет доступных пользователей для назначения.')
         return context
 
