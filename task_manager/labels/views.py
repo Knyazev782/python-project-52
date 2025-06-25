@@ -12,6 +12,7 @@ class LabelsView(LoginRequiredMixin, ListView):
     model = Labels
     template_name = 'labels/label_list.html'
 
+
 class CreateLabels(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Labels
     form_class = LabelsForm
@@ -19,12 +20,14 @@ class CreateLabels(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('labels')
     success_message = 'Метка успешно создана'
 
+
 class UpdateLabels(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Labels
     form_class = LabelsForm
     template_name = 'labels/label_update.html'
     success_url = reverse_lazy('labels')
     success_message = 'Метка успешно изменена'
+
 
 class DeleteLabels(LoginRequiredMixin, DeleteView):
     model = Labels
@@ -38,3 +41,9 @@ class DeleteLabels(LoginRequiredMixin, DeleteView):
             messages.error(request, 'Нельзя удалить метку, связанную с задачами')
             return redirect('labels')
         return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, self.success_message)
+        return redirect(self.success_url)
