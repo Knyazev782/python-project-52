@@ -15,7 +15,7 @@
     <form method="post">
         {% csrf_token %}
         <p>Вы уверены, что хотите удалить пользователя {{ object.first_name }} {{ object.last_name }}?</p>
-        <button type="submit" class="btn btn-danger">Удалить</button>
+        <button type="submit" class="btn btn-danger">Да, удалить</button>
         <a href="{% url 'users' %}" class="btn btn-secondary">Отмена</a>
     </form>
 {% endif %}
