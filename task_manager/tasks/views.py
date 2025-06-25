@@ -25,7 +25,17 @@ class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        if not form.is_valid():
+            return self.form_invalid(form)
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not context['form'].fields['status'].queryset.exists():
+            messages.error(self.request, 'Нет доступных статусов для выбора.')
+        if not context['form'].fields['assigned_to'].queryset.exists():
+            messages.error(self.request, 'Нет доступных пользователей для назначения.')
+        return context
 
 
 class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
