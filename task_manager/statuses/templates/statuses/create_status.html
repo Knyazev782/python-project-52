@@ -5,7 +5,11 @@
 <h2>Создание статуса</h2>
 <form method="post">
     {% csrf_token %}
-    {% bootstrap_form form %}
+    {% for field in form %}
+        {% if field.name == 'name' %}
+            {% bootstrap_field field label="Имя" %}
+        {% endif %}
+    {% endfor %}
     <button type="submit" class="btn btn-primary">Создать</button>
 </form>
 {% endblock %}
