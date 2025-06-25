@@ -5,3 +5,6 @@ class CreateStatusForm(forms.ModelForm):
     class Meta:
         model = Statuses
         fields = ('name',)
+        labels = {
+            'name': 'Имя',
+        }
