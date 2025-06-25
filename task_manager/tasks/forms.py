@@ -9,6 +9,9 @@ class TaskForm(forms.ModelForm):
         widgets = {
             'labels': forms.CheckboxSelectMultiple(),
         }
+        labels = {
+            'name': 'Имя',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
