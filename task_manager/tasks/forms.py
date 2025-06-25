@@ -2,6 +2,7 @@ from django import forms
 from .models import Tasks
 from task_manager.labels.models import Labels
 
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Tasks
@@ -11,6 +12,11 @@ class TaskForm(forms.ModelForm):
         }
         labels = {
             'name': 'Имя',
+            'description': 'Описание',
+            'status': 'Статус',
+            'assigned_to': 'Исполнитель',
+            'author': 'Автор',
+            'labels': 'Метки',
         }
 
     def __init__(self, *args, **kwargs):
