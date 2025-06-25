@@ -33,8 +33,7 @@
             <form action="{% url 'update_status' pk=status.id %}" method="get">
                 <button type="submit" class="btn btn-outline-primary">Изменить</button>
             </form>
-            <form action="{% url 'delete_status' pk=status.id %}" method="post">
-                {% csrf_token %}
+            <form action="{% url 'delete_status' pk=status.id %}" method="get">
                 <button type="submit" class="btn btn-outline-danger">Удалить</button>
             </form>
         </td>

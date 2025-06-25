@@ -10,12 +10,14 @@ from django.contrib import messages
 from django.http import HttpResponse
 import rollbar
 
+
 class StatusesView(ListView):
     model = Statuses
     template_name = 'statuses/statuses_list.html'
 
     def get_queryset(self):
         return Statuses.objects.all()
+
 
 class CreateStatus(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Statuses
@@ -27,6 +29,7 @@ class CreateStatus(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
 
 class UpdateStatus(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Statuses
@@ -45,6 +48,7 @@ class UpdateStatus(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_object(self, queryset=None):
         return super().get_object(queryset)
 
+
 class DeleteStatus(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Statuses
     template_name = 'statuses/delete_status.html'
@@ -61,6 +65,9 @@ class DeleteStatus(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def get_object(self, queryset=None):
         return super().get_object(queryset)
 
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data())
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         try:
@@ -69,6 +76,7 @@ class DeleteStatus(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         except ProtectedError:
             messages.error(request, "Нельзя удалить статус, так как он используется.")
         return redirect(self.success_url)
+
 
 def test_error_view(request):
     try:
