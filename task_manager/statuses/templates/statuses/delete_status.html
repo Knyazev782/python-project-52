@@ -16,7 +16,7 @@
     <form method="post">
         {% csrf_token %}
         <p>Вы уверены, что хотите удалить статус?</p>
-        <button type="submit" class="btn btn-danger">Удалить</button>
+        <button type="submit" class="btn btn-danger">Да, удалить</button>
         <a href="{% url 'statuses' %}" class="btn btn-secondary">Отмена</a>
     </form>
 {% endif %}
