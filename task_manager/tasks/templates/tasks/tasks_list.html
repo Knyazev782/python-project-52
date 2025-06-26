@@ -12,18 +12,53 @@
     </form>
   {% endif %}
 
-  <!-- Список задач -->
-  {% if filter.qs %}
+  <!-- Список задач с пагинацией -->
+  {% if page_obj %}
     <ul class="list-group mt-3">
-      {% for task in filter.qs %}
+      {% for task in page_obj %}
         <li class="list-group-item">
           {{ task.name }} - Статус: {{ task.status.name }} - Исполнитель: {{ task.assigned_to.username }}
-          <!-- Убраны метки для упрощения рендеринга -->
         </li>
       {% empty %}
         <li class="list-group-item">Нет задач по фильтру</li>
       {% endfor %}
     </ul>
+
+    <!-- Навигация по страницам -->
+    <nav aria-label="Page navigation" class="mt-3">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+
   {% else %}
     <p>Нет задач.</p>
   {% endif %}

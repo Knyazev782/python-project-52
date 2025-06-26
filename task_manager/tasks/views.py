@@ -13,13 +13,19 @@ class TasksView(FilterView, ListView):
     model = Tasks
     filterset_class = TaskFilter
     template_name = 'tasks/tasks_list.html'
+    paginate_by = 10  # добавляем пагинацию
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('status', 'assigned_to', 'author')
         self.filterset = self.get_filterset(self.request.GET)
-        if self.filterset.is_valid() and self.request.GET:
-            return self.filterset.qs
-        return queryset[:10]
+        if self.filterset.is_valid():
+            return self.filterset.qs.select_related('status', 'assigned_to', 'author').all()
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filterset
+        return context
 
 
 class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
