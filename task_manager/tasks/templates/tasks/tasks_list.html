@@ -18,11 +18,7 @@
       {% for task in filter.qs %}
         <li class="list-group-item">
           {{ task.name }} - Статус: {{ task.status.name }} - Исполнитель: {{ task.assigned_to.username }}
-          {% if task.labels.exists %}
-            Метки: {% for label in task.labels.all %}{{ label.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-          {% else %}
-            (Без меток)
-          {% endif %}
+          <!-- Убраны метки для упрощения рендеринга -->
         </li>
       {% empty %}
         <li class="list-group-item">Нет задач по фильтру</li>
