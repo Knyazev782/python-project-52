@@ -9,23 +9,16 @@ from .forms import TaskForm
 from .filters.task_filter import TaskFilter
 
 
-class TasksView(FilterView, ListView):
+class TasksView(LoginRequiredMixin, FilterView):
     model = Tasks
     filterset_class = TaskFilter
     template_name = 'tasks/tasks_list.html'
-    paginate_by = 10  # добавляем пагинацию
+    paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related('status', 'assigned_to', 'author')
-        self.filterset = self.get_filterset(self.request.GET)
-        if self.filterset.is_valid():
-            return self.filterset.qs.select_related('status', 'assigned_to', 'author').all()
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['filter'] = self.filterset
-        return context
+        # Используем базовый queryset с select_related для оптимизации
+        qs = Tasks.objects.select_related('status', 'assigned_to', 'author').all()
+        return qs
 
 
 class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
