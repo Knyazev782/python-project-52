@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect, reverse, render
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django_filters.views import FilterView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -24,10 +24,18 @@ class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('tasks')
     success_message = 'Задача успешно создана'
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        response = super().form_valid(form)
-        return HttpResponseRedirect(reverse('tasks'))
+    def get(self, request, *args, **kwargs):
+        form = self.get_form()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.instance.author = self.request.user
+            form.save()
+            messages.success(request, self.success_message)
+            return HttpResponseRedirect(reverse('tasks'))
+        return render(request, self.template_name, {'form': form})
 
 
 class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
