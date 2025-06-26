@@ -1,11 +1,9 @@
-from django.shortcuts import redirect, reverse, render
+from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django_filters.views import FilterView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.messages.views import SuccessMessageMixin, messages
 from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect
-from django.contrib import messages
 from .models import Tasks
 from .forms import TaskForm
 from .filters.task_filter import TaskFilter
@@ -24,18 +22,9 @@ class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('tasks')
     success_message = 'Задача успешно создана'
 
-    def get(self, request, *args, **kwargs):
-        form = self.get_form()
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            form.instance.author = self.request.user
-            form.save()
-            messages.success(request, self.success_message)
-            return HttpResponseRedirect(reverse('tasks'))
-        return render(request, self.template_name, {'form': form})
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 
 class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -69,4 +58,5 @@ class DeleteTask(LoginRequiredMixin, DeleteView):
 
 class DetailTask(LoginRequiredMixin, DetailView):
     model = Tasks
-    template_name = 'tasks/task_detail.html'
+    template_name = 'tasks/view_task.html'
+    context_object_name = 'task'
