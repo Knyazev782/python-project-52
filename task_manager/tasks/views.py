@@ -15,11 +15,11 @@ class TasksView(FilterView, ListView):
     template_name = 'tasks/tasks_list.html'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related('status', 'assigned_to', 'author')
         self.filterset = self.get_filterset(self.request.GET)
         if self.filterset.is_valid() and self.request.GET:
             return self.filterset.qs
-        return queryset.select_related('status', 'assigned_to', 'author')
+        return queryset[:50]
 
 
 class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
