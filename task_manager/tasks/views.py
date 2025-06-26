@@ -1,9 +1,10 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django_filters.views import FilterView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .models import Tasks
 from .forms import TaskForm
@@ -25,7 +26,8 @@ class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        return HttpResponseRedirect(reverse('tasks'))
 
 
 class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):

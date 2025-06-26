@@ -2,11 +2,10 @@ from django import forms
 from .models import Tasks
 from task_manager.labels.models import Labels
 
-
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Tasks
-        fields = ['name', 'description', 'status', 'assigned_to', 'author', 'labels']
+        fields = ['name', 'description', 'status', 'assigned_to', 'labels']
         widgets = {
             'labels': forms.SelectMultiple(),
         }
@@ -15,7 +14,6 @@ class TaskForm(forms.ModelForm):
             'description': 'Описание',
             'status': 'Статус',
             'assigned_to': 'Исполнитель',
-            'author': 'Автор',
             'labels': 'Метки',
         }
 
