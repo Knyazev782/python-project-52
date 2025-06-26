@@ -14,6 +14,12 @@ class TasksView(FilterView, ListView):
     filterset_class = TaskFilter
     template_name = 'tasks/tasks_list.html'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = self.get_filterset(self.request.GET)
+        if self.filterset.is_valid() and self.request.GET:
+            return self.filterset.qs
+        return queryset
 
 class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Tasks
