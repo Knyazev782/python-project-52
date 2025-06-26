@@ -19,7 +19,7 @@ class TasksView(FilterView, ListView):
         self.filterset = self.get_filterset(self.request.GET)
         if self.filterset.is_valid() and self.request.GET:
             return self.filterset.qs
-        return queryset[:50]
+        return queryset[:10]
 
 
 class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
