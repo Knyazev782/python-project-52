@@ -14,36 +14,47 @@ class CrudLabelsTestCases(TestCase):
         self.status1 = Statuses.objects.create(name='In Progress', created_by=self.user1)
         self.label1 = Labels.objects.create(name='Label1')
         self.label2 = Labels.objects.create(name='Label2')
-        self.task1 = Tasks.objects.create(name='Task1',
-                                          description='Desc1',
-                                          author=self.user1,
-                                          status=self.status1,
-                                          assigned_to=self.user1,
-                                          )
+        self.task1 = Tasks.objects.create(
+            name='Task1',
+            description='Desc1',
+            author=self.user1,
+            status=self.status1,
+            assigned_to=self.user1,
+        )
         self.task1.labels.add(self.label1)
-        self.task2 = Tasks.objects.create(name='Task2',
-                                          description='Desc2',
-                                          author=self.user2,
-                                          status=self.status1,
-                                          assigned_to=self.user2)
+        self.task2 = Tasks.objects.create(
+            name='Task2',
+            description='Desc2',
+            author=self.user2,
+            status=self.status1,
+            assigned_to=self.user2
+        )
         self.client.login(username='user1', password='12345')
 
     def test_list_labels(self):
         response = self.client.get(reverse('labels'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'labels/label_list.html')
+        self.assertContains(response, 'Label1')
+        self.assertContains(response, 'Label2')
 
     def test_create_labels(self):
         self.assertEqual(Labels.objects.count(), 2)
-        response = self.client.post(reverse('label_create'), {'name': 'NewLAbel'})
+        response = self.client.post(reverse('label_create'), {'name': 'NewLabel'})
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('labels'))
         self.assertEqual(Labels.objects.count(), 3)
+        response = self.client.get(reverse('labels'))
+        self.assertContains(response, 'Метка успешно создана')
 
     def test_update_labels(self):
         url_path = reverse('label_update', kwargs={'pk': self.label1.pk})
-        response = self.client.post(url_path, {'name': "UpdateLabel"})
+        response = self.client.post(url_path, {'name': 'UpdatedLabel'})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Labels.objects.get(pk=self.label1.pk).name, 'UpdateLabel')
+        self.assertRedirects(response, reverse('labels'))
+        self.assertEqual(Labels.objects.get(pk=self.label1.pk).name, 'UpdatedLabel')
+        response = self.client.get(reverse('labels'))
+        self.assertContains(response, 'Метка успешно изменена')
 
     def test_delete_own_labels(self):
         url_path = reverse('label_delete', kwargs={'pk': self.label2.pk})
@@ -51,18 +62,26 @@ class CrudLabelsTestCases(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('labels'))
         self.assertEqual(Labels.objects.count(), 1)
+        response = self.client.get(reverse('labels'))
+        self.assertContains(response, 'Метка успешно удалена')
 
     def test_delete_linked_labels(self):
         url_path = reverse('label_delete', kwargs={'pk': self.label1.pk})
         response = self.client.post(url_path)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('labels'))
-        messages = list(response.wsgi_request._messages)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Нельзя удалить метку, связанную с задачами')
+        response = self.client.get(reverse('labels'))
+        self.assertContains(response, 'Нельзя удалить метку, потому что она используется')
+
+    def test_unauthenticated_access(self):
+        self.client.logout()
+        response = self.client.get(reverse('labels'))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/login/?next=/labels/')
 
     def tearDown(self):
         self.client.logout()
         Tasks.objects.all().delete()
         Labels.objects.all().delete()
         Users.objects.all().delete()
+        Statuses.objects.all().delete()

@@ -2,42 +2,39 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>Пользователи</h2>
-{% if messages %}
-    {% with messages.last as last_message %}
-        {% if last_message.tags == 'error' %}
-            <div class="alert alert-danger">{{ last_message }}</div>
-        {% elif last_message.tags == 'success' %}
-            <div class="alert alert-success">{{ last_message }}</div>
-        {% endif %}
-    {% endwith %}
-{% endif %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Имя пользователя</th>
-            <th>Полное имя</th>
-            <th>Дата создания</th>
-            <th></th>
-        </tr>
-    </thead>
-    {% for user in object_list %}
-    <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.first_name }} {{ user.last_name }}</td>
-        <td>{{ user.date_joined }}</td>
-        <td>
-            <form action="{% url 'update_user' pk=user.id %}" method="get">
-                <button type="submit" class="btn btn-outline-primary">Изменить</button>
-            </form>
-            <form action="{% url 'delete_user' pk=user.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger">Удалить</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="container wrapper flex-grow-1">
+    <h1 class="my-4">Пользователи</h1>
+    <a class="btn btn-primary mb-3" href="{% url 'create_user' %}">Создать пользователя</a>
+    {% bootstrap_messages %}
+    {% if users %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя пользователя</th>
+                <th>Полное имя</th>
+                <th>Дата создания</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.pk }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.get_full_name }}</td>
+                <td>{{ user.created_at|date:"d.m.Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'update_user' user.pk %}">Изменить</a>
+                    <br>
+                    <a href="{% url 'delete_user' user.pk %}">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Пользователей пока нет</p>
+    {% endif %}
+</div>
 {% endblock %}

@@ -2,22 +2,37 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-  <h1>Список меток</h1>
-  {% if object_list %}
-    <ul>
-      {% for label in object_list %}
-        <li>
-          {{ label.name }} (Создано: {{ label.created_at|date:"d.m.Y H:i" }})
-          <a href="{% url 'label_update' label.pk %}">Редактировать</a>
-          <a href="{% url 'label_delete' label.pk %}">Удалить</a>
-        </li>
-      {% empty %}
-        <li>Нет меток.</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Нет меток.</p>
-  {% endif %}
-  <a href="{% url 'label_create' %}" class="btn btn-primary">Создать метку</a>
-  {% bootstrap_messages %}
+<div class="container wrapper flex-grow-1">
+    <h1 class="my-4">Метки</h1>
+    <a class="btn btn-primary mb-3" href="{% url 'label_create' %}">Создать метку</a>
+    {% bootstrap_messages %}
+    {% if labels %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Дата создания</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for label in labels %}
+            <tr>
+                <td>{{ label.pk }}</td>
+                <td>{{ label.name }}</td>
+                <td>{{ label.created_at|date:"d.m.Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'label_update' label.pk %}">Изменить</a>
+                    <br>
+                    <a href="{% url 'label_delete' label.pk %}">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Меток пока нет</p>
+    {% endif %}
+</div>
 {% endblock %}

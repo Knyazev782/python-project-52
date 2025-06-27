@@ -11,6 +11,8 @@ from django.contrib import messages
 class LabelsView(LoginRequiredMixin, ListView):
     model = Labels
     template_name = 'labels/label_list.html'
+    context_object_name = 'labels'
+
 
 class CreateLabels(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Labels
@@ -19,22 +21,24 @@ class CreateLabels(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('labels')
     success_message = 'Метка успешно создана'
 
+
 class UpdateLabels(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Labels
     form_class = LabelsForm
     template_name = 'labels/label_update.html'
     success_url = reverse_lazy('labels')
-    success_message = 'Метка обновлена'
+    success_message = 'Метка успешно изменена'
 
-class DeleteLabels(LoginRequiredMixin, DeleteView):
+
+class DeleteLabels(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Labels
     template_name = 'labels/label_delete.html'
     success_url = reverse_lazy('labels')
-    success_message = "Метка успешно удалена"
+    success_message = 'Метка успешно удалена'
 
     def dispatch(self, request, *args, **kwargs):
         label = self.get_object()
         if label.tasks.exists():
-            messages.error(request, 'Нельзя удалить метку, связанную с задачами')
+            messages.error(request, 'Нельзя удалить метку, потому что она используется')
             return redirect('labels')
         return super().dispatch(request, *args, **kwargs)
