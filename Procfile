@@ -1,1 +1,1 @@
-web: gunicorn --chdir hexlet_code hexlet_code.wsgi:application --bind 0.0.0.0:$PORT
+web: python manage.py migrate --noinput && gunicorn --chdir task_manager task_manager.wsgi:application --bind 0.0.0.0:$PORT
