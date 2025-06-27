@@ -36,15 +36,17 @@
                     </li>
                 {% endif %}
             </ul>
-            {% if user.is_authenticated %}
-                <form action="{% url 'logout' %}" method="post" class="form-inline my-2 my-lg-0">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-success">Выйти ({{ user.get_full_name }})</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
-                <a href="{% url 'create_user' %}" class="btn btn-outline-success">Регистрация</a>
-            {% endif %}
+            <div class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post" class="form-inline my-2 my-lg-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success">Выйти ({{ user.get_full_name }})</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-success">Вход</a>
+                    <a href="{% url 'create_user' %}" class="btn btn-outline-success">Регистрация</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
     {% bootstrap_messages %}
