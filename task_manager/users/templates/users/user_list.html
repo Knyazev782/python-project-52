@@ -2,39 +2,33 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="container wrapper flex-grow-1">
-    <h1 class="my-4">Пользователи</h1>
-    <a class="btn btn-primary mb-3" href="{% url 'create_user' %}">Создать пользователя</a>
-    {% bootstrap_messages %}
-    {% if users %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Имя пользователя</th>
-                <th>Полное имя</th>
-                <th>Дата создания</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.pk }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.get_full_name }}</td>
-                <td>{{ user.created_at|date:"d.m.Y H:i" }}</td>
-                <td>
-                    <a href="{% url 'update_user' user.pk %}">Изменить</a>
-                    <br>
-                    <a href="{% url 'delete_user' user.pk %}">Удалить</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Пользователей пока нет</p>
-    {% endif %}
-</div>
+    <div class="container mt-4">
+        <h1 class="my-4">Пользователи</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя пользователя</th>
+                    <th>Полное имя</th>
+                    <th>Дата создания</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.get_full_name }}</td>
+                        <td>{{ user.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'update_user' user.pk %}">Изменить</a>
+                            <a href="{% url 'delete_user' user.pk %}">Удалить</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'create_user' %}" class="btn btn-primary">Создать пользователя</a>
+    </div>
 {% endblock %}

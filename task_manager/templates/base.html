@@ -11,41 +11,43 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="{% url 'index' %}">Task Manager</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'statuses' %}">Статусы</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks' %}">Задачи</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'labels' %}">Метки</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
-                    </li>
-                {% endif %}
-            </ul>
-            <div class="navbar-nav">
-                {% if user.is_authenticated %}
-                    <form action="{% url 'logout' %}" method="post" class="form-inline my-2 my-lg-0">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-success">Выйти ({{ user.get_full_name }})</button>
-                    </form>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-outline-success">Вход</a>
-                    <a href="{% url 'create_user' %}" class="btn btn-outline-success">Регистрация</a>
-                {% endif %}
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">Task Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'statuses' %}">Статусы</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'tasks' %}">Задачи</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'labels' %}">Метки</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex">
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn">Выйти ({{ user.get_full_name }})</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn me-2">Вход</a>
+                        <a href="{% url 'create_user' %}" class="btn">Регистрация</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
