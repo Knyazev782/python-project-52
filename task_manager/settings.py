@@ -80,12 +80,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'task_manager.wsgi.application'
 
+# Настройка двух баз данных
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
         conn_max_age=600,
+    ),
+    'postgres': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        env='DATABASE_URL',
+        conn_max_age=600,
     )
 }
+
+# Указание базы для тестов
+DATABASES['default']['TEST'] = {'NAME': str(BASE_DIR / 'test_db.sqlite3')}
+DATABASES['postgres']['TEST'] = {'NAME': str(BASE_DIR / 'test_db_postgres.sqlite3')}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
