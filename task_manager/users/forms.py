@@ -1,6 +1,5 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Users
-
 
 class UserRegistrationForm(UserCreationForm):
     class Meta:
@@ -13,3 +12,6 @@ class UserRegistrationForm(UserCreationForm):
             'password1': 'Пароль',
             'password2': 'Подтверждение пароля',
         }
+
+class UserLoginForm(AuthenticationForm):
+    pass

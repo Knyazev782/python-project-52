@@ -2,12 +2,14 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-  <h1>Удалить задачу</h1>
-  <p>Вы уверены, что хотите удалить задачу "{{ object.name }}"?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Удалить</button>
-  </form>
-  <a href="{% url 'tasks' %}" class="btn btn-secondary">Отмена</a>
-  {% bootstrap_messages %}
+    <div class="container mt-4">
+        <h1 class="my-4">Удаление задачи</h1>
+        {% bootstrap_messages %}
+        <p>Вы уверены, что хотите удалить задачу {{ object.name }}?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Да, удалить</button>
+            <a href="{% url 'tasks' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
 {% endblock %}

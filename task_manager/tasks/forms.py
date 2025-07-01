@@ -1,15 +1,15 @@
 from django import forms
 from .models import Tasks
-from task_manager.labels.models import Labels
 
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Tasks
-        fields = ['name', 'description', 'status', 'assigned_to', 'author', 'labels']
-        widgets = {
-            'labels': forms.CheckboxSelectMultiple(),
+        fields = ['name', 'description', 'status', 'author', 'assigned_to', 'labels']
+        labels = {
+            'name': 'Название',
+            'description': 'Описание',
+            'status': 'Статус',
+            'author': 'Автор',
+            'assigned_to': 'Исполнитель',
+            'labels': 'Метки',
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['labels'].queryset = Labels.objects.all()

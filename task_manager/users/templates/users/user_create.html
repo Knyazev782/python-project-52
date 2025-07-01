@@ -4,29 +4,12 @@
 {% block content %}
     <div class="container mt-4">
         <h1 class="my-4">Создание пользователя</h1>
+        {% bootstrap_messages %}
         <form method="post">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="id_username" class="form-label">Имя пользователя</label>
-                <input type="text" class="form-control" id="id_username" name="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="id_first_name" class="form-label">Имя</label>
-                <input type="text" class="form-control" id="id_first_name" name="first_name" required>
-            </div>
-            <div class="mb-3">
-                <label for="id_last_name" class="form-label">Фамилия</label>
-                <input type="text" class="form-control" id="id_last_name" name="last_name" required>
-            </div>
-            <div class="mb-3">
-                <label for="id_password1" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="id_password1" name="password1" required>
-            </div>
-            <div class="mb-3">
-                <label for="id_password2" class="form-label">Подтверждение пароля</label>
-                <input type="password" class="form-control" id="id_password2" name="password2" required>
-            </div>
+            {% bootstrap_form form %}
             <button type="submit" class="btn btn-primary">Создать</button>
+            <a href="{% url 'users' %}" class="btn btn-secondary">Отмена</a>
         </form>
     </div>
 {% endblock %}

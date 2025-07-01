@@ -7,15 +7,8 @@
         {% bootstrap_messages %}
         <form method="post">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Имя пользователя</label>
-                <input type="text" class="form-control" id="{{ form.username.id_for_label }}" name="username" placeholder="Имя пользователя" required>
-            </div>
-            <div class="mb-3">
-                <label for="{{ form.password.id_for_label }}" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="{{ form.password.id_for_label }}" name="password" placeholder="Пароль" required>
-            </div>
-            <button type="submit" class="btn">Войти</button>
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">Войти</button>
         </form>
     </div>
 {% endblock %}

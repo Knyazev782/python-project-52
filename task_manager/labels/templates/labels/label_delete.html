@@ -2,13 +2,14 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="container wrapper flex-grow-1">
-    <h1 class="my-4">Удаление метки</h1>
-    {% bootstrap_messages %}
-    <p>Вы уверены, что хотите удалить метку {{ object.name }}?</p>
-    <form method="post">
-        {% csrf_token %}
-        <input type="submit" class="btn btn-danger" value="Да, удалить">
-    </form>
-</div>
+    <div class="container mt-4">
+        <h1 class="my-4">Удаление метки</h1>
+        {% bootstrap_messages %}
+        <p>Вы уверены, что хотите удалить метку {{ object.name }}?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Да, удалить</button>
+            <a href="{% url 'labels' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
 {% endblock %}

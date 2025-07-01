@@ -3,12 +3,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib import messages
 from .models import Users
-from .forms import UserRegistrationForm
-from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import ProtectedError
+from .forms import UserRegistrationForm, UserLoginForm
 
 class UsersView(ListView):
     model = Users
@@ -52,26 +50,21 @@ class DeleteUser(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
             return redirect('users')
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        try:
-            self.object.delete()
-            messages.success(request, 'Пользователь успешно удалён')
-            return redirect(self.success_url)
-        except ProtectedError:
-            messages.error(request, 'Нельзя удалить пользователя, потому что он используется')
-            return redirect(self.success_url)
-
-
 def login_view(request):
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
+        form = UserLoginForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            messages.success(request, 'Вы успешно вошли в систему.')
             return redirect('index')
         else:
-            messages.error(request, "Неверное имя пользователя или пароль.")
+            messages.error(request, 'Неверное имя пользователя или пароль.')
     else:
-        form = AuthenticationForm()
+        form = UserLoginForm()
     return render(request, 'registration/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Вы успешно вышли из системы.')
+    return redirect('login')

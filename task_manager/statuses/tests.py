@@ -1,65 +1,121 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from task_manager.users.models import Users
-from task_manager.statuses.models import Statuses
+from .models import Users
+from django.contrib.messages import get_messages
+from .models import Statuses
+from .forms import StatusForm
 
 
-class CrudStatusesTestCases(TestCase):
+class StatusesViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = Users.objects.create_user(username='testuser', password='12345')
-        self.another_user = Users.objects.create_user(username='anotheruser', password='12345')
-        self.client.login(username='testuser', password='12345')
-        self.status = Statuses.objects.create(name='Test Status', created_by=self.user)
-        self.another_status = Statuses.objects.create(name='Another Status', created_by=self.another_user)
+        self.user1 = Users.objects.create_user(
+            username='user1', password='password123'
+        )
+        self.user2 = Users.objects.create_user(
+            username='user2', password='password123'
+        )
+        self.status1 = Statuses.objects.create(
+            name='Status 1', created_by=self.user1
+        )
+        self.status2 = Statuses.objects.create(
+            name='Status 2', created_by=self.user2
+        )
 
-    def test_create_status(self):
-        response = self.client.post(reverse('create_status'), {'name': 'New Status'})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Statuses.objects.count(), 3)
+        self.statuses_url = reverse('statuses')
+        self.create_url = reverse('create_status')
+        self.update_url = reverse('update_status', args=[self.status1.id])
+        self.delete_url = reverse('delete_status', args=[self.status1.id])
 
-    def test_list_statuses(self):
-        response = self.client.get(reverse('statuses'))
+    def test_statuses_view_GET(self):
+        response = self.client.get(self.statuses_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'statuses/statuses_list.html')
+        self.assertContains(response, 'Status 1')
+        self.assertContains(response, 'Status 2')
 
-    def test_update_own_status(self):
-        url_path = reverse('update_status', kwargs={'pk': self.status.id})
-        response = self.client.get(url_path)
+    def test_create_status_GET_authenticated(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.get(self.create_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'statuses/create_status.html')
+        self.assertIsInstance(response.context['form'], StatusForm)
+
+    def test_create_status_GET_unauthenticated(self):
+        response = self.client.get(self.create_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, f'/login/?next={self.create_url}')
+
+    def test_create_status_POST_valid(self):
+        self.client.login(username='user1', password='password123')
+        data = {'name': 'New Status'}
+        response = self.client.post(self.create_url, data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Статус успешно создан')
+        self.assertEqual(Statuses.objects.count(), 3)
+        new_status = Statuses.objects.latest('id')
+        self.assertEqual(new_status.created_by, self.user1)
+        self.assertRedirects(response, self.statuses_url)
+
+    def test_update_status_GET_owner(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.get(self.update_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'statuses/update_status.html')
 
-    def test_update_another_status(self):
-        url_path = reverse('update_status', kwargs={'pk': self.another_status.id})
-        response = self.client.get(url_path)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('statuses'))
-        messages = list(response.wsgi_request._messages)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Вы можете изменять только свои статусы.")
+    def test_update_status_GET_not_owner(self):
+        self.client.login(username='user2', password='password123')
+        response = self.client.get(self.update_url)
 
-    def test_delete_own_status(self):
-        url_path = reverse('delete_status', kwargs={'pk': self.status.id})
-        response = self.client.post(url_path)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Вы не можете редактировать чужой статус.')
+        self.assertRedirects(response, self.statuses_url)
+
+    def test_update_status_GET_unauthenticated(self):
+        response = self.client.get(self.update_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('statuses'))
+        self.assertTrue(response.url.startswith('/login/'))
+
+    def test_update_status_POST_valid(self):
+        self.client.login(username='user1', password='password123')
+        data = {'name': 'Updated Status'}
+        response = self.client.post(self.update_url, data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Статус успешно изменён')
+        self.status1.refresh_from_db()
+        self.assertEqual(self.status1.name, 'Updated Status')
+        self.assertRedirects(response, self.statuses_url)
+
+    def test_delete_status_GET_owner(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'statuses/delete_status.html')
+
+    def test_delete_status_GET_not_owner(self):
+        self.client.login(username='user2', password='password123')
+        response = self.client.get(self.delete_url)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Вы не можете удалить чужой статус.')
+        self.assertRedirects(response, self.statuses_url)
+
+    def test_delete_status_GET_unauthenticated(self):
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('/statuses/'))
+
+    def test_delete_status_POST_success(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.post(self.delete_url)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Статус успешно удалён')
         self.assertEqual(Statuses.objects.count(), 1)
-
-    def test_delete_another_status(self):
-        url_path = reverse('delete_status', kwargs={'pk': self.another_status.id})
-        response = self.client.post(url_path)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('statuses'))
-        messages = list(response.wsgi_request._messages)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Вы можете удалять только свои статусы.")
-
-    # test_protected_status, так как нет зависимостей
-    # def test_protected_status(self):
-    #     with self.assertRaises(IntegrityError):
-    #         self.status.delete()
-
-    def tearDown(self):
-        self.client.logout()
-        Users.objects.all().delete()
-        Statuses.objects.all().delete()
+        self.assertRedirects(response, self.statuses_url)

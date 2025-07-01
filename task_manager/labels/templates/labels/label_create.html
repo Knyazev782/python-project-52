@@ -2,13 +2,14 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="container wrapper flex-grow-1">
-    <h1 class="my-4">Создать метку</h1>
-    {% bootstrap_messages %}
-    <form method="post">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <input type="submit" class="btn btn-primary" value="Создать">
-    </form>
-</div>
+    <div class="container mt-4">
+        <h1 class="my-4">Создание метки</h1>
+        {% bootstrap_messages %}
+        <form method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">Создать</button>
+            <a href="{% url 'labels' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
 {% endblock %}

@@ -18,10 +18,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- Всегда доступно -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
+                    </li>
+                    <!-- Доступно только после авторизации -->
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'statuses' %}">Статусы</a>
                         </li>
@@ -31,21 +33,17 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'labels' %}">Метки</a>
                         </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users' %}">Пользователи</a>
-                        </li>
                     {% endif %}
                 </ul>
                 <div class="d-flex">
                     {% if user.is_authenticated %}
                         <form action="{% url 'logout' %}" method="post" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn">Выйти ({{ user.get_full_name }})</button>
+                            <button type="submit" class="btn btn-outline-light">Выйти ({{ user.get_full_name }})</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn me-2">Вход</a>
-                        <a href="{% url 'create_user' %}" class="btn">Регистрация</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Вход</a>
+                        <a href="{% url 'user_create' %}" class="btn btn-outline-light">Регистрация</a>
                     {% endif %}
                 </div>
             </div>
@@ -54,8 +52,11 @@
     {% bootstrap_messages %}
     {% block content %}
         <div class="container mt-4">
-            <h1>Добро пожаловать в Task Manager</h1>
+            <h1>{% block header %}Добро пожаловать в Task Manager{% endblock %}</h1>
             <p>Здесь вы можете управлять задачами, статусами и метками.</p>
+            {% if not user.is_authenticated %}
+                <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'user_create' %}">зарегистрируйтесь</a>, чтобы получить полный доступ.</p>
+            {% endif %}
         </div>
     {% endblock %}
 </body>

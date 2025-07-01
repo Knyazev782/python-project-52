@@ -1,87 +1,110 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from task_manager.users.models import Users
-from task_manager.tasks.models import Tasks
-from task_manager.labels.models import Labels
-from task_manager.statuses.models import Statuses
+from .models import Users
+from django.contrib.messages import get_messages
+from .models import Labels
+from .forms import LabelForm
 
 
-class CrudLabelsTestCases(TestCase):
+class LabelsViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user1 = Users.objects.create_user(username='user1', password='12345')
-        self.user2 = Users.objects.create_user(username='user2', password='12345')
-        self.status1 = Statuses.objects.create(name='In Progress', created_by=self.user1)
-        self.label1 = Labels.objects.create(name='Label1')
-        self.label2 = Labels.objects.create(name='Label2')
-        self.task1 = Tasks.objects.create(
-            name='Task1',
-            description='Desc1',
-            author=self.user1,
-            status=self.status1,
-            assigned_to=self.user1,
+        self.user1 = Users.objects.create_user(
+            username='user1', password='password123'
         )
-        self.task1.labels.add(self.label1)
-        self.task2 = Tasks.objects.create(
-            name='Task2',
-            description='Desc2',
-            author=self.user2,
-            status=self.status1,
-            assigned_to=self.user2
+        self.user2 = Users.objects.create_user(
+            username='user2', password='password123'
         )
-        self.client.login(username='user1', password='12345')
+        self.label1 = Labels.objects.create(
+            name='Label 1', created_by=self.user1
+        )
+        self.label2 = Labels.objects.create(
+            name='Label 2', created_by=self.user2
+        )
 
-    def test_list_labels(self):
-        response = self.client.get(reverse('labels'))
+        self.labels_url = reverse('labels')
+        self.create_url = reverse('label_create')
+        self.update_url = reverse('label_update', args=[self.label1.id])
+        self.delete_url = reverse('label_delete', args=[self.label1.id])
+
+    def test_labels_view_GET(self):
+        response = self.client.get(self.labels_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'labels/label_list.html')
-        self.assertContains(response, 'Label1')
-        self.assertContains(response, 'Label2')
+        self.assertContains(response, 'Label 1')
+        self.assertContains(response, 'Label 2')
 
-    def test_create_labels(self):
-        self.assertEqual(Labels.objects.count(), 2)
-        response = self.client.post(reverse('label_create'), {'name': 'NewLabel'})
+    def test_create_label_GET_authenticated(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.get(self.create_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'labels/label_create.html')
+        self.assertIsInstance(response.context['form'], LabelForm)
+
+    def test_create_label_GET_unauthenticated(self):
+        response = self.client.get(self.create_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('labels'))
+        self.assertRedirects(response, f'/login/?next={self.create_url}')
+
+    def test_create_label_POST_valid(self):
+        self.client.login(username='user1', password='password123')
+        data = {'name': 'New Label'}
+        response = self.client.post(self.create_url, data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Метка успешно создана')
         self.assertEqual(Labels.objects.count(), 3)
-        response = self.client.get(reverse('labels'))
-        self.assertContains(response, 'Метка успешно создана')
+        self.assertEqual(Labels.objects.last().created_by, self.user1)
+        self.assertRedirects(response, self.labels_url)
 
-    def test_update_labels(self):
-        url_path = reverse('label_update', kwargs={'pk': self.label1.pk})
-        response = self.client.post(url_path, {'name': 'UpdatedLabel'})
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('labels'))
-        self.assertEqual(Labels.objects.get(pk=self.label1.pk).name, 'UpdatedLabel')
-        response = self.client.get(reverse('labels'))
-        self.assertContains(response, 'Метка успешно изменена')
+    def test_update_label_GET_owner(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.get(self.update_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'labels/label_update.html')
 
-    def test_delete_own_labels(self):
-        url_path = reverse('label_delete', kwargs={'pk': self.label2.pk})
-        response = self.client.post(url_path)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('labels'))
+    def test_update_label_GET_not_owner(self):
+        self.client.login(username='user2', password='password123')
+        response = self.client.get(self.update_url)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Вы не можете редактировать чужую метку.')
+        self.assertRedirects(response, self.labels_url)
+
+    def test_update_label_POST_valid(self):
+        self.client.login(username='user1', password='password123')
+        data = {'name': 'Updated Label'}
+        response = self.client.post(self.update_url, data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Метка успешно изменена')
+        self.label1.refresh_from_db()
+        self.assertEqual(self.label1.name, 'Updated Label')
+        self.assertRedirects(response, self.labels_url)
+
+    def test_delete_label_GET_owner(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'labels/label_delete.html')
+
+    def test_delete_label_GET_not_owner(self):
+        self.client.login(username='user2', password='password123')
+        response = self.client.get(self.delete_url)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Вы не можете удалить чужую метку.')
+        self.assertRedirects(response, self.labels_url)
+
+    def test_delete_label_POST_success(self):
+        self.client.login(username='user1', password='password123')
+        response = self.client.post(self.delete_url)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Метка успешно удалена')
         self.assertEqual(Labels.objects.count(), 1)
-        response = self.client.get(reverse('labels'))
-        self.assertContains(response, 'Метка успешно удалена')
-
-    def test_delete_linked_labels(self):
-        url_path = reverse('label_delete', kwargs={'pk': self.label1.pk})
-        response = self.client.post(url_path)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('labels'))
-        response = self.client.get(reverse('labels'))
-        self.assertContains(response, 'Нельзя удалить метку, потому что она используется')
-
-    def test_unauthenticated_access(self):
-        self.client.logout()
-        response = self.client.get(reverse('labels'))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/login/?next=/labels/')
-
-    def tearDown(self):
-        self.client.logout()
-        Tasks.objects.all().delete()
-        Labels.objects.all().delete()
-        Users.objects.all().delete()
-        Statuses.objects.all().delete()
+        self.assertRedirects(response, self.labels_url)

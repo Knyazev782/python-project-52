@@ -1,19 +1,26 @@
-from django.shortcuts import redirect
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
-from django_filters.views import FilterView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Tasks
 from .forms import TaskForm
-from .filters.task_filter import TaskFilter
 
 
-class TasksView(FilterView, ListView):
+class TasksView(ListView):
     model = Tasks
-    filterset_class = TaskFilter
     template_name = 'tasks/tasks_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Tasks.objects.all()
+
+
+class TaskDetailView(DetailView):
+    model = Tasks
+    template_name = 'tasks/task_detail.html'
+    context_object_name = 'task'
 
 
 class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -28,35 +35,39 @@ class CreateTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class UpdateTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Tasks
     form_class = TaskForm
     template_name = 'tasks/task_update.html'
     success_url = reverse_lazy('tasks')
-    success_message = 'Задача успешно обновлена'
+    success_message = 'Задача успешно изменена'
 
-    def dispatch(self, request, *args, **kwargs):
-        task = self.get_object()
-        if task.author != self.request.user:
-            messages.error(request, 'Вы не можете изменять эту задачу!')
+    def test_func(self):
+        return self.request.user == self.get_object().author
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            messages.error(self.request, 'Вы не можете редактировать чужую задачу.')
             return redirect('tasks')
-        return super().dispatch(request, *args, **kwargs)
+        else:
+            messages.error(self.request, 'Вы не авторизованы')
+            return redirect('login')
 
-
-class DeleteTask(LoginRequiredMixin, DeleteView):
+class DeleteTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     model = Tasks
     template_name = 'tasks/task_delete.html'
     success_url = reverse_lazy('tasks')
     success_message = 'Задача успешно удалена'
 
-    def dispatch(self, request, *args, **kwargs):
-        task = self.get_object()
-        if task.author != self.request.user:
-            messages.error(request, 'Вы не можете удалять эту задачу!')
+    def test_func(self):
+        return self.request.user == self.get_object().author
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            messages.error(self.request, 'Вы не можете удалять чужую задачу.')
             return redirect('tasks')
-        return super().dispatch(request, *args, **kwargs)
+        else:
+            messages.error(self.request, 'Вы не авторизованы')
+            return redirect('login')
 
 
-class DetailTask(LoginRequiredMixin, DetailView):
-    model = Tasks
-    template_name = 'tasks/task_detail.html'

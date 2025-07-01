@@ -2,21 +2,14 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>Изменение статуса</h2>
-{% if messages %}
-    {% with messages.last as last_message %}
-        {% if last_message.tags == 'error' %}
-            <div class="alert alert-danger">{{ last_message }}</div>
-        {% elif last_message.tags == 'success' %}
-            <div class="alert alert-success">{{ last_message }}</div>
-        {% endif %}
-    {% endwith %}
-{% endif %}
-{% if not messages %}
-    <form method="post">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-    </form>
-{% endif %}
+    <div class="container mt-4">
+        <h1 class="my-4">Изменение статуса</h1>
+        {% bootstrap_messages %}
+        <form method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">Изменить</button>
+            <a href="{% url 'statuses' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
 {% endblock %}
