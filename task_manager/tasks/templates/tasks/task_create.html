@@ -2,14 +2,11 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h1 class="my-4">Создание задачи</h1>
-        {% bootstrap_messages %}
-        <form method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary">Создать</button>
-            <a href="{% url 'tasks' %}" class="btn btn-secondary">Отмена</a>
-        </form>
-    </div>
+    <h1 class="my-4">Создать задачу</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
 {% endblock %}

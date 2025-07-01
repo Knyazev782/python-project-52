@@ -1,16 +1,48 @@
 {% extends 'base.html' %}
-{% load django_bootstrap5 %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h1 class="my-4">Детали задачи</h1>
-        <p><strong>Название:</strong> {{ task.name }}</p>
-        <p><strong>Описание:</strong> {{ task.description|default:"-" }}</p>
-        <p><strong>Статус:</strong> {{ task.status.name }}</p>
-        <p><strong>Автор:</strong> {{ task.author.get_full_name }}</p>
-        <p><strong>Исполнитель:</strong> {{ task.assigned_to.get_full_name|default:"-" }}</p>
-        <p><strong>Метки:</strong> {% for label in task.labels.all %}{{ label.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</p>
-        <p><strong>Дата создания:</strong> {{ task.created_at|date:"d.m.Y H:i" }}</p>
-        <a href="{% url 'tasks' %}" class="btn btn-secondary">Назад</a>
+    <h1 class="my-4">Просмотр задачи</h1>
+
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h2>{{ task.name }}</h2>
+        </div>
+        <div class="card-body">
+            <p>{{ task.description }}</p>
+            <hr>
+            <div class="container">
+                <div class="row p-1">
+                    <div class="col">Автор</div>
+                    <div class="col">{{ task.author.get_full_name }}</div>
+                </div>
+                <div class="row p-1">
+                    <div class="col">Исполнитель</div>
+                    <div class="col">{{ task.assigned_to.get_full_name|default:"Не назначен" }}</div>
+                </div>
+                <div class="row p-1">
+                    <div class="col">Статус</div>
+                    <div class="col">{{ task.status.name }}</div>
+                </div>
+                <div class="row p-1">
+                    <div class="col">Дата создания</div>
+                    <div class="col">{{ task.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                <div class="row p-1">
+                    <div class="col">Метки</div>
+                    <div class="col">
+                        <ul>
+                            {% for label in task.labels.all %}
+                                <li>{{ label.name }}</li>
+                            {% empty %}
+                                <li>Нет меток</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <a href="{% url 'task_update' task.id %}" class="btn btn-primary">Изменить</a>
+            <a href="{% url 'task_delete' task.id %}" class="btn btn-danger">Удалить</a>
+        </div>
     </div>
 {% endblock %}
