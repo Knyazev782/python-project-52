@@ -6,7 +6,16 @@
 
     <form method="post">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        <div class="mb-3">
+            <label for="id_username" class="form-label">Имя пользователя</label>
+            <input type="text" name="username" class="form-control" id="id_username"
+                   placeholder="Имя пользователя" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Пароль</label>
+            <input type="password" name="password" class="form-control" id="id_password"
+                   placeholder="Пароль" required>
+        </div>
         <button type="submit" class="btn btn-primary">Войти</button>
     </form>
 {% endblock %}

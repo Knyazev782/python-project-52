@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1 class="my-4">Метки</h1>
-    <a href="{% url 'create_label' %}" class="btn btn-primary mb-3">Создать метку</a>
+    <a href="{% url 'label_create' %}" class="btn btn-primary mb-3">Создать метку</a>
 
     <table class="table table-striped">
         <thead>
@@ -21,8 +21,8 @@
                 <td>{{ label.name }}</td>
                 <td>{{ label.created_at|date:"d.m.Y H:i" }}</td>
                 <td>
-                    <a href="{% url 'update_label' label.id %}" class="btn btn-sm btn-primary">Изменить</a>
-                    <a href="{% url 'delete_label' label.id %}" class="btn btn-sm btn-danger">Удалить</a>
+                    <a href="{% url 'label_update' label.id %}" class="btn btn-sm btn-primary">Изменить</a>
+                    <a href="{% url 'label_delete' label.id %}" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
             {% endfor %}
