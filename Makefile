@@ -11,8 +11,7 @@ build:
 	./build.sh
 
 render-start:
-	render-start:
-	uv run -- python manage.py migrate --noinput && uv run -- gunicorn --chdir task_manager task_manager.wsgi:application --bind 0.0.0.0:$(PORT)
+	gunicorn task_manager.wsgi
 
 test:
 	python manage.py migrate
