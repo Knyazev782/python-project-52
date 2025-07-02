@@ -51,6 +51,10 @@ class DeleteUser(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         return super().dispatch(request, *args, **kwargs)
 
 def login_view(request):
+    if request.user.is_authenticated:
+        messages.info(request, 'Вы уже вошли в систему.')
+        return redirect('index')
+
     if request.method == "POST":
         form = UserLoginForm(request, data=request.POST)
         if form.is_valid():
