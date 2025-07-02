@@ -6,15 +6,24 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from .models import Tasks
 from .forms import TaskForm
+from .filters.task_filter import TaskFilter
 
 
 class TasksView(ListView):
     model = Tasks
+    filterset_class = TaskFilter
     template_name = 'tasks/tasks_list.html'
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Tasks.objects.all()
+        queryset = super().get_queryset().select_related('status', 'assigned_to', 'author')
+        self.filterset = self.filterset_class(self.request.GET, queryset=queryset, request=self.request)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filterset
+        return context
 
 
 class TaskDetailView(DetailView):
@@ -53,6 +62,7 @@ class UpdateTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, U
             messages.error(self.request, 'Вы не авторизованы')
             return redirect('login')
 
+
 class DeleteTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     model = Tasks
     template_name = 'tasks/task_delete.html'
@@ -69,5 +79,3 @@ class DeleteTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, D
         else:
             messages.error(self.request, 'Вы не авторизованы')
             return redirect('login')
-
-

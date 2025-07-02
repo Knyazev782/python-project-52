@@ -8,33 +8,16 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" class="form-inline">
-                <div class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <label class="form-label">Статус</label>
-                        {{ filter.form.status }}
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label">Исполнитель</label>
-                        {{ filter.form.assigned_to }}
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label">Метка</label>
-                        {{ filter.form.labels }}
-                    </div>
-                    <div class="col-auto">
-                        <div class="form-check">
-                            {{ filter.form.self_tasks }}
-                            <label class="form-check-label">Только свои задачи</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Показать</button>
-                    </div>
+                {% bootstrap_form filter.form layout='inline' %}
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-primary">Показать</button>
+                    <a href="{% url 'tasks' %}" class="btn btn-secondary">Сбросить</a>
                 </div>
             </form>
         </div>
     </div>
 
+    {% if tasks %}
     <table class="table table-striped">
         <thead>
             <tr>
@@ -64,4 +47,7 @@
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div class="alert alert-info">Задачи не найдены. Попробуйте изменить параметры фильтра.</div>
+    {% endif %}
 {% endblock %}
